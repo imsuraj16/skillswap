@@ -1,12 +1,15 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../store/actions/userActions";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+const user = useSelector(state=>state.user.user)
+
+
 
   const {
     register,
@@ -15,10 +18,22 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm();
 
-  const loginUserHandler = (userdata) => {
-    dispatch(loginUser(userdata));
+ const loginUserHandler = async (userdata) => {
+  try {
+    const res = await dispatch(loginUser(userdata)); // thunk call
+    const savedUser = JSON.parse(localStorage.getItem("user"));
+
+    if (!savedUser) {
+      alert("Invalid email or password");
+      return;
+    }
+
     navigate('/');
-  };
+  } catch (err) {
+    console.log(err);
+    alert("Something went wrong");
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex justify-center items-center p-4">
